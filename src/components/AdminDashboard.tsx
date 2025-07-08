@@ -134,8 +134,8 @@ export default function AdminDashboard() {
         </div>
 
         {/* Main content */}
-        <main className="pt-22 py-6">
-          <div className="px-6 sm:px-8 lg:px-12">
+        <main className="pt-20 py-6">
+          <div className="px-4 sm:px-6 lg:px-8">
             <Routes>
               <Route path="/create" element={<CreateInvoice />} />
               <Route path="/update" element={<UpdateInvoice />} />
