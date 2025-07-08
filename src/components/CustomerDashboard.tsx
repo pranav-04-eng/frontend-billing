@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
+import { Download, FileText, ExternalLink } from 'lucide-react';
 import CompanyHeader from './CompanyHeader';
 
 interface Invoice {
@@ -11,6 +12,8 @@ interface Invoice {
   paymentStatus: 'Paid' | 'Unpaid' | 'Partial' | 'Overdue';
   customerEmail: string;
   invoiceAmount: string; // ✅ Added price
+  pdfUrl?: string; // PDF URL field
+  attachmentPath?: string; // Alternative attachment path
 }
 
 export default function CustomerDashboard() {
@@ -44,6 +47,34 @@ export default function CustomerDashboard() {
     fetchInvoices();
   }, [user]);
 
+  const handleDownloadPDF = async (invoice: Invoice) => {
+    try {
+      // Try to download using the pdfUrl first, then fallback to attachmentPath
+      const downloadUrl = invoice.pdfUrl || invoice.attachmentPath;
+      
+      if (!downloadUrl) {
+        alert('No PDF available for this invoice');
+        return;
+      }
+
+      // If it's a relative path, prepend the backend URL
+      const fullUrl = downloadUrl.startsWith('http') 
+        ? downloadUrl 
+        : `https://7a4dfd49-1068-49c4-8595-9766ad4ba406-00-15iczbx9nres8.riker.replit.dev${downloadUrl}`;
+
+      // Create a temporary link and trigger download
+      const link = document.createElement('a');
+      link.href = fullUrl;
+      link.download = `Invoice_${invoice.invoiceNumber || invoice.id}.pdf`;
+      link.target = '_blank';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error('Error downloading PDF:', error);
+      alert('Error downloading PDF. Please try again.');
+    }
+  };
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -91,6 +122,7 @@ export default function CustomerDashboard() {
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Payment Status</th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Customer Email</th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Price (₹)</th> {/* ✅ */}
+               <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">PDF</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -121,6 +153,38 @@ export default function CustomerDashboard() {
                   <td className="px-6 py-4 text-sm text-gray-900">{invoice.customerEmail}</td>
                  <td className="px-6 py-4 text-sm text-gray-900">
 {invoice.invoiceAmount ? `₹${parseFloat(invoice.invoiceAmount).toFixed(2)}` : 'N/A'}
+</td>
+                  <td className="px-6 py-4 text-sm">
+                    {(invoice.pdfUrl || invoice.attachmentPath) ? (
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => handleDownloadPDF(invoice)}
+                          className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 hover:border-blue-300 transition-colors"
+                          title="Download PDF"
+                        >
+                          <Download className="h-3 w-3" />
+                          Download
+                        </button>
+                        {invoice.pdfUrl && (
+                          <a
+                            href={invoice.pdfUrl.startsWith('http') ? invoice.pdfUrl : `https://7a4dfd49-1068-49c4-8595-9766ad4ba406-00-15iczbx9nres8.riker.replit.dev${invoice.pdfUrl}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-green-600 bg-green-50 border border-green-200 rounded-md hover:bg-green-100 hover:border-green-300 transition-colors"
+                            title="View PDF"
+                          >
+                            <ExternalLink className="h-3 w-3" />
+                            View
+                          </a>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-1 text-gray-400">
+                        <FileText className="h-3 w-3" />
+                        <span className="text-xs">No PDF</span>
+                      </div>
+                    )}
+                  </td>
 </td>
                 </tr>
               ))}
