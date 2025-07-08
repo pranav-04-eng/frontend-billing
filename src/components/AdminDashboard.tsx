@@ -40,9 +40,9 @@ export default function AdminDashboard() {
       {/* Mobile sidebar */}
       <div className={`fixed inset-0 z-40 lg:hidden ${sidebarOpen ? 'block' : 'hidden'}`}>
         <div className="fixed inset-0 bg-gray-600 bg-opacity-75" onClick={() => setSidebarOpen(false)} />
-        <div className="fixed inset-y-0 left-0 flex w-64 flex-col bg-white shadow-xl">
+        <div className="fixed inset-y-0 left-0 flex w-80 flex-col bg-white shadow-xl">
           <div className="flex h-16 items-center justify-between px-4 border-b border-gray-200">
-            <h1 className="text-lg font-semibold text-gray-900">Admin Portal</h1>
+            <h1 className="text-xl font-semibold text-gray-900">Admin Portal</h1>
             <button
               onClick={() => setSidebarOpen(false)}
               className="rounded-md p-2 hover:bg-gray-100 transition-colors"
@@ -56,13 +56,13 @@ export default function AdminDashboard() {
                 key={item.name}
                 to={item.href}
                 onClick={() => setSidebarOpen(false)}
-                className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md mb-1 transition-colors ${
+                className={`group flex items-center px-3 py-3 text-base font-medium rounded-md mb-1 transition-colors ${
                   isActive(item.href)
                     ? 'bg-blue-100 text-blue-900'
                     : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                 }`}
               >
-                <item.icon className="mr-3 h-5 w-5" />
+                <item.icon className="mr-3 h-6 w-6" />
                 {item.name}
               </Link>
             ))}
@@ -71,10 +71,10 @@ export default function AdminDashboard() {
       </div>
 
       {/* Desktop sidebar */}
-      <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-64 lg:flex-col">
+      <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-80 lg:flex-col">
         <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6 py-4">
           <div className="flex h-16 shrink-0 items-center">
-            <h1 className="text-xl font-bold text-gray-900">Admin Portal</h1>
+            <h1 className="text-2xl font-bold text-gray-900">Admin Portal</h1>
           </div>
           <nav className="flex flex-1 flex-col">
             <ul className="flex flex-1 flex-col gap-y-7">
@@ -84,13 +84,13 @@ export default function AdminDashboard() {
                     <li key={item.name}>
                       <Link
                         to={item.href}
-                        className={`group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold transition-colors ${
+                        className={`group flex gap-x-3 rounded-md p-3 text-base leading-6 font-semibold transition-colors ${
                           isActive(item.href)
                             ? 'bg-blue-50 text-blue-600'
                             : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
                         }`}
                       >
-                        <item.icon className="h-5 w-5 shrink-0" />
+                        <item.icon className="h-6 w-6 shrink-0" />
                         {item.name}
                       </Link>
                     </li>
@@ -102,7 +102,7 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      <div className="lg:pl-64">
+      <div className="lg:pl-80">
         {/* Top bar */}
         <div className="sticky top-12 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
           <button
@@ -138,7 +138,7 @@ export default function AdminDashboard() {
 
         {/* Main content */}
         <main className="py-6">
-          <div className="px-4 sm:px-6 lg:px-8">
+          <div className="px-6 sm:px-8 lg:px-12">
             <Routes>
               <Route path="/create" element={<CreateInvoice />} />
               <Route path="/update" element={<UpdateInvoice />} />
