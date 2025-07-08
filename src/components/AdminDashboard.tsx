@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import CompanyHeader from './CompanyHeader';
 import { 
   FileText, 
   Plus, 
@@ -100,16 +99,9 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Company Header - positioned above content */}
-      <div className="lg:pl-80">
-        <div className="sticky top-0 z-30">
-          <CompanyHeader variant="minimal" />
-        </div>
-      </div>
-
       <div className="lg:pl-80">
         {/* Top bar */}
-        <div className="sticky top-12 z-20 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
+        <div className="sticky top-0 z-20 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
           <button
             type="button"
             className="-m-2.5 p-2.5 text-gray-700 lg:hidden"
