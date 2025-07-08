@@ -35,10 +35,8 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <CompanyHeader variant="minimal" />
-      
       {/* Mobile sidebar */}
-      <div className={`fixed inset-0 z-40 lg:hidden ${sidebarOpen ? 'block' : 'hidden'}`}>
+      <div className={`fixed inset-0 z-50 lg:hidden ${sidebarOpen ? 'block' : 'hidden'}`}>
         <div className="fixed inset-0 bg-gray-600 bg-opacity-75" onClick={() => setSidebarOpen(false)} />
         <div className="fixed inset-y-0 left-0 flex w-80 flex-col bg-white shadow-xl">
           <div className="flex h-16 items-center justify-between px-4 border-b border-gray-200">
@@ -71,7 +69,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Desktop sidebar */}
-      <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-80 lg:flex-col">
+      <div className="hidden lg:fixed lg:inset-y-0 lg:z-40 lg:flex lg:w-80 lg:flex-col">
         <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6 py-4">
           <div className="flex h-16 shrink-0 items-center">
             <h1 className="text-2xl font-bold text-gray-900">Admin Portal</h1>
@@ -102,9 +100,16 @@ export default function AdminDashboard() {
         </div>
       </div>
 
+      {/* Company Header - positioned above content */}
+      <div className="lg:pl-80">
+        <div className="sticky top-0 z-30">
+          <CompanyHeader variant="minimal" />
+        </div>
+      </div>
+
       <div className="lg:pl-80">
         {/* Top bar */}
-        <div className="sticky top-12 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
+        <div className="sticky top-12 z-20 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
           <button
             type="button"
             className="-m-2.5 p-2.5 text-gray-700 lg:hidden"

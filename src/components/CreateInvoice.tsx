@@ -76,12 +76,7 @@ const CreateInvoice: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="bg-white border border-gray-200 rounded-lg p-1">
-        <CompanyHeader variant="minimal" className="rounded-md" />
-      </div>
-      
-      <div className="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-md border border-gray-200">
+    <div className="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-md border border-gray-200">
         <h2 className="text-xl font-semibold mb-4">Create Invoice</h2>
       {successMessage && <div className="text-green-600 mb-4">{successMessage}</div>}
 
@@ -181,7 +176,6 @@ const CreateInvoice: React.FC = () => {
           </button>
         </div>
       </form>
-    </div>
     </div>
   );
 };
