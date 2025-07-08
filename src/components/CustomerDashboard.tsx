@@ -185,7 +185,6 @@ export default function CustomerDashboard() {
                       </div>
                     )}
                   </td>
-</td>
                 </tr>
               ))}
             </tbody>
