@@ -101,7 +101,7 @@ export default function AdminDashboard() {
 
       <div className="lg:pl-80">
         {/* Top bar */}
-        <div className="sticky top-0 z-20 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
+        <div className="fixed top-0 right-0 left-0 lg:left-80 z-50 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
           <button
             type="button"
             className="-m-2.5 p-2.5 text-gray-700 lg:hidden"
@@ -134,7 +134,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Main content */}
-        <main className="py-6">
+        <main className="pt-22 py-6">
           <div className="px-6 sm:px-8 lg:px-12">
             <Routes>
               <Route path="/create" element={<CreateInvoice />} />
