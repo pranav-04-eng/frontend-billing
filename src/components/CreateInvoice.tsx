@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import CompanyHeader from './CompanyHeader';
 
 const CreateInvoice: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -75,8 +76,13 @@ const CreateInvoice: React.FC = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto bg-white p-6 rounded shadow-md">
-      <h2 className="text-xl font-semibold mb-4">Create Invoice</h2>
+    <div className="space-y-6">
+      <div className="bg-white border border-gray-200 rounded-lg p-1">
+        <CompanyHeader variant="minimal" className="rounded-md" />
+      </div>
+      
+      <div className="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-md border border-gray-200">
+        <h2 className="text-xl font-semibold mb-4">Create Invoice</h2>
       {successMessage && <div className="text-green-600 mb-4">{successMessage}</div>}
 
       <form onSubmit={handleSubmit} className="space-y-4">

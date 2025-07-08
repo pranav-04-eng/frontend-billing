@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useInvoices } from '../contexts/InvoiceContext';
 import { Search, Save, AlertCircle, CheckCircle } from 'lucide-react';
+import CompanyHeader from './CompanyHeader';
 
 export default function UpdateInvoice() {
   const { searchInvoice, updateInvoice } = useInvoices();
@@ -84,7 +85,12 @@ export default function UpdateInvoice() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="space-y-6">
+      <div className="bg-white border border-gray-200 rounded-lg p-1">
+        <CompanyHeader variant="minimal" className="rounded-md" />
+      </div>
+      
+      <div className="max-w-4xl mx-auto">
       <div className="bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl">
         <div className="px-4 py-6 sm:p-8">
           <div className="grid max-w-4xl grid-cols-1 gap-x-6 gap-y-8">

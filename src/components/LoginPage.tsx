@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { LogIn, AlertCircle, User, Lock, Mail } from 'lucide-react';
+import CompanyHeader from './CompanyHeader';
 
 export default function LoginPage() {
   const [loginType, setLoginType] = useState<'customer' | 'admin'>('customer');
@@ -36,20 +37,26 @@ export default function LoginPage() {
 
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div className="text-center">
-          <div className="mx-auto h-16 w-16 bg-blue-600 rounded-full flex items-center justify-center">
-            <LogIn className="h-8 w-8 text-white" />
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      <CompanyHeader />
+      
+      <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full space-y-8">
+          <div className="text-center">
+            <div className="mx-auto h-16 w-16 bg-blue-600 rounded-full flex items-center justify-center">
+              <LogIn className="h-8 w-8 text-white" />
+            </div>
+            <h2 className="mt-6 text-3xl font-bold text-gray-900">
+              Billing System
+            </h2>
+            <p className="mt-2 text-sm text-gray-600">
+              Sign in to your account
+            </p>
           </div>
-          <h2 className="mt-6 text-3xl font-bold text-gray-900">
-            Billing System
-          </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Sign in to your account
-          </p>
         </div>
-
+      </div>
+      
+      <div className="max-w-md mx-auto px-4 sm:px-6 lg:px-8 pb-12">
         {/* Login Type Toggle */}
         <div className="flex rounded-lg bg-gray-100 p-1">
           <button
