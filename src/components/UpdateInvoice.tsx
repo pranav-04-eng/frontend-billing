@@ -9,48 +9,50 @@ export default function UpdateInvoice() {
   const [formData, setFormData] = useState({
     dueDate: '',
     paymentStatus: 'Unpaid' as 'Paid' | 'Unpaid' | 'Partial' | 'Overdue',
+    invoiceAmount: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleSearch = async () => {
-  const trimmedTerm = searchTerm.trim();
-
-  if (!trimmedTerm) {
-    setErrors({ search: 'Please enter an invoice number' });
-    setSelectedInvoice(null); // Clear previous invoice if any
-    return; // ❌ Prevents unnecessary fetch
-  }
-
-  setLoading(true);
-  setErrors({}); // Clear any previous errors
-
-  try {
-    const invoice = await searchInvoice(trimmedTerm); // GET /invoices/search/:invoiceNumber
-
-    if (invoice) {
-      setSelectedInvoice(invoice);
-      setFormData({
-        dueDate: invoice.dueDate?.split('T')[0] || '',
-        paymentStatus: invoice.paymentStatus || 'Unpaid',
-      });
-    } else {
-      setErrors({ search: 'Invoice not found' });
+    const trimmedTerm = searchTerm.trim();
+    if (!trimmedTerm) {
+      setErrors({ search: 'Please enter an invoice number' });
       setSelectedInvoice(null);
+      return;
     }
-  } catch (error) {
-    setErrors({ search: 'Error fetching invoice' });
-    setSelectedInvoice(null);
-  } finally {
-    setLoading(false);
-  }
-};
+
+    setLoading(true);
+    setErrors({});
+    try {
+      const invoice = await searchInvoice(trimmedTerm);
+      if (invoice) {
+        setSelectedInvoice(invoice);
+        setFormData({
+          dueDate: invoice.dueDate?.split('T')[0] || '',
+          paymentStatus: invoice.paymentStatus || 'Unpaid',
+          invoiceAmount: invoice.invoiceAmount?.toString() || '',
+        });
+      } else {
+        setErrors({ search: 'Invoice not found' });
+        setSelectedInvoice(null);
+      }
+    } catch (error) {
+      setErrors({ search: 'Error fetching invoice' });
+      setSelectedInvoice(null);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
     if (!formData.dueDate) {
       newErrors.dueDate = 'Due date is required';
+    }
+    if (!formData.invoiceAmount || isNaN(Number(formData.invoiceAmount))) {
+      newErrors.invoiceAmount = 'Valid invoice amount is required';
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -66,14 +68,13 @@ export default function UpdateInvoice() {
       const updateData = {
         dueDate: formData.dueDate,
         paymentStatus: formData.paymentStatus,
+        invoiceAmount: parseFloat(formData.invoiceAmount),
       };
-      const success = await updateInvoice(selectedInvoice.id, updateData); // Uses PUT /invoices/:id
+      const success = await updateInvoice(selectedInvoice.id, updateData);
       if (success) {
         setSuccess(true);
         const updatedInvoice = await searchInvoice(selectedInvoice.invoiceNumber);
-        if (updatedInvoice) {
-          setSelectedInvoice(updatedInvoice);
-        }
+        if (updatedInvoice) setSelectedInvoice(updatedInvoice);
       }
     } catch (error) {
       setErrors({ submit: 'Error updating invoice' });
@@ -90,7 +91,7 @@ export default function UpdateInvoice() {
             <div>
               <h2 className="text-2xl font-bold leading-7 text-gray-900">Update Invoice</h2>
               <p className="mt-1 text-sm leading-6 text-gray-600">
-                Search by invoice number and update the due date or payment status.
+                Search by invoice number and update the due date, payment status, or amount.
               </p>
             </div>
 
@@ -98,7 +99,7 @@ export default function UpdateInvoice() {
             <div>
               <div className="flex flex-col sm:flex-row gap-4">
                 <div className="flex-1">
-                  <label htmlFor="search" className="block text-sm font-medium leading-6 text-gray-900">
+                  <label htmlFor="search" className="block text-sm font-medium text-gray-900">
                     Invoice Number
                   </label>
                   <div className="mt-2">
@@ -107,7 +108,7 @@ export default function UpdateInvoice() {
                       id="search"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
+                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-blue-600 sm:text-sm"
                       placeholder="e.g., INV-2024-001"
                     />
                   </div>
@@ -117,7 +118,7 @@ export default function UpdateInvoice() {
                     type="button"
                     onClick={handleSearch}
                     disabled={loading}
-                    className="rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
+                    className="rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-500 disabled:opacity-50 flex items-center gap-2"
                   >
                     <Search className="h-4 w-4" />
                     {loading ? 'Searching...' : 'Search'}
@@ -134,7 +135,7 @@ export default function UpdateInvoice() {
               )}
             </div>
 
-            {/* Invoice Display + Update Form */}
+            {/* Invoice Details and Form */}
             {selectedInvoice && (
               <>
                 <div className="bg-gray-50 rounded-lg p-4">
@@ -148,31 +149,26 @@ export default function UpdateInvoice() {
                       <p className="text-sm font-medium text-gray-700">Customer Email</p>
                       <p className="text-sm text-gray-900">{selectedInvoice.customerEmail}</p>
                     </div>
-                  <div>
-  <p className="text-sm font-medium text-gray-700">Invoice Date</p>
-  <p className="text-sm text-gray-900">
-    {new Date(selectedInvoice.invoiceDate).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    })}
-  </p>
-</div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-700">Invoice Date</p>
+                      <p className="text-sm text-gray-900">
+                        {new Date(selectedInvoice.invoiceDate).toLocaleDateString()}
+                      </p>
+                    </div>
                     <div>
                       <p className="text-sm font-medium text-gray-700">Status</p>
-                      <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          selectedInvoice.paymentStatus === 'Paid'
-                            ? 'bg-green-100 text-green-800'
-                            : selectedInvoice.paymentStatus === 'Partial'
-                            ? 'bg-yellow-100 text-yellow-800'
-                            : selectedInvoice.paymentStatus === 'Overdue'
-                            ? 'bg-red-100 text-red-800'
-                            : 'bg-gray-100 text-gray-800'
-                        }`}
-                      >
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        selectedInvoice.paymentStatus === 'Paid' ? 'bg-green-100 text-green-800' :
+                        selectedInvoice.paymentStatus === 'Partial' ? 'bg-yellow-100 text-yellow-800' :
+                        selectedInvoice.paymentStatus === 'Overdue' ? 'bg-red-100 text-red-800' :
+                        'bg-gray-100 text-gray-800'
+                      }`}>
                         {selectedInvoice.paymentStatus}
                       </span>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-700">Amount (₹)</p>
+                      <p className="text-sm text-gray-900">{selectedInvoice.invoiceAmount}</p>
                     </div>
                   </div>
                 </div>
@@ -187,56 +183,63 @@ export default function UpdateInvoice() {
                 )}
 
                 <form onSubmit={handleSubmit} className="space-y-8 mt-6">
-                  <div className="grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-6">
+                    {/* Due Date */}
                     <div>
-                      <label htmlFor="dueDate" className="block text-sm font-medium leading-6 text-gray-900">
-                        Due Date *
-                      </label>
-                      <div className="mt-2">
-                        <input
-                          type="date"
-                          id="dueDate"
-                          name="dueDate"
-                          value={formData.dueDate}
-                          onChange={(e) =>
-                            setFormData((prev) => ({ ...prev, dueDate: e.target.value }))
-                          }
-                          className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6 ${
-                            errors.dueDate ? 'ring-red-500' : ''
-                          }`}
-                        />
-                        {errors.dueDate && (
-                          <p className="mt-2 text-sm text-red-600">{errors.dueDate}</p>
-                        )}
-                      </div>
+                      <label htmlFor="dueDate" className="block text-sm font-medium text-gray-900">Due Date *</label>
+                      <input
+                        type="date"
+                        id="dueDate"
+                        value={formData.dueDate}
+                        onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
+                        className={`mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset focus:ring-2 focus:ring-blue-600 sm:text-sm ${
+                          errors.dueDate ? 'ring-red-500' : 'ring-gray-300'
+                        }`}
+                      />
+                      {errors.dueDate && <p className="text-sm text-red-600 mt-1">{errors.dueDate}</p>}
                     </div>
 
+                    {/* Payment Status */}
                     <div>
-                      <label htmlFor="paymentStatus" className="block text-sm font-medium leading-6 text-gray-900">
+                      <label htmlFor="paymentStatus" className="block text-sm font-medium text-gray-900">
                         Payment Status
                       </label>
-                      <div className="mt-2">
-                        <select
-                          id="paymentStatus"
-                          name="paymentStatus"
-                          value={formData.paymentStatus}
-                          onChange={(e) =>
-                            setFormData((prev) => ({
-                              ...prev,
-                              paymentStatus: e.target.value as any,
-                            }))
-                          }
-                          className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
-                        >
-                          <option value="Unpaid">Unpaid</option>
-                          <option value="Paid">Paid</option>
-                          <option value="Partial">Partial</option>
-                          <option value="Overdue">Overdue</option>
-                        </select>
-                      </div>
+                      <select
+                        id="paymentStatus"
+                        value={formData.paymentStatus}
+                        onChange={(e) => setFormData({ ...formData, paymentStatus: e.target.value as any })}
+                        className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-600 sm:text-sm"
+                      >
+                        <option value="Unpaid">Unpaid</option>
+                        <option value="Paid">Paid</option>
+                        <option value="Partial">Partial</option>
+                        <option value="Overdue">Overdue</option>
+                      </select>
+                    </div>
+
+                    {/* Invoice Amount */}
+                    <div>
+                      <label htmlFor="invoiceAmount" className="block text-sm font-medium text-gray-900">
+                        Invoice Amount (₹) *
+                      </label>
+                      <input
+                        type="number"
+                        id="invoiceAmount"
+                        value={formData.invoiceAmount}
+                        onChange={(e) => setFormData({ ...formData, invoiceAmount: e.target.value })}
+                        className={`mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset focus:ring-2 focus:ring-blue-600 sm:text-sm ${
+                          errors.invoiceAmount ? 'ring-red-500' : 'ring-gray-300'
+                        }`}
+                        step="0.01"
+                        min="0"
+                      />
+                      {errors.invoiceAmount && (
+                        <p className="text-sm text-red-600 mt-1">{errors.invoiceAmount}</p>
+                      )}
                     </div>
                   </div>
 
+                  {/* Submit */}
                   {errors.submit && (
                     <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                       <div className="flex items-center">
@@ -245,15 +248,14 @@ export default function UpdateInvoice() {
                       </div>
                     </div>
                   )}
-
                   <div className="flex justify-end">
                     <button
                       type="submit"
                       disabled={loading}
-                      className="rounded-md bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
+                      className="rounded-md bg-blue-600 px-6 py-3 text-sm font-semibold text-white hover:bg-blue-500 disabled:opacity-50 flex items-center gap-2"
                     >
                       <Save className="h-4 w-4" />
-                      {loading ? 'Saving Changes...' : 'Save Changes'}
+                      {loading ? 'Saving...' : 'Save Changes'}
                     </button>
                   </div>
                 </form>

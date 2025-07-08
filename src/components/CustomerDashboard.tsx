@@ -9,6 +9,7 @@ interface Invoice {
   dueDate: string;
   paymentStatus: 'Paid' | 'Unpaid' | 'Partial' | 'Overdue';
   customerEmail: string;
+  invoiceAmount: string; // ✅ Added price
 }
 
 export default function CustomerDashboard() {
@@ -29,6 +30,7 @@ export default function CustomerDashboard() {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
         });
+    
         setInvoices(response.data.invoices || []);
       } catch (err: any) {
         console.error(err);
@@ -82,6 +84,7 @@ export default function CustomerDashboard() {
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Due Date</th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Payment Status</th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Customer Email</th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Price (₹)</th> {/* ✅ */}
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -110,6 +113,9 @@ export default function CustomerDashboard() {
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-900">{invoice.customerEmail}</td>
+                 <td className="px-6 py-4 text-sm text-gray-900">
+{invoice.invoiceAmount ? `₹${parseFloat(invoice.invoiceAmount).toFixed(2)}` : 'N/A'}
+</td>
                 </tr>
               ))}
             </tbody>

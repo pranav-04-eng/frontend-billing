@@ -8,6 +8,7 @@ const CreateInvoice: React.FC = () => {
     invoiceDate: new Date().toISOString().split('T')[0],
     dueDate: '',
     paymentStatus: 'Unpaid' as 'Paid' | 'Unpaid',
+    invoiceAmount: '', // ✅ NEW field
   });
 
   const [attachment, setAttachment] = useState<File | null>(null);
@@ -22,6 +23,9 @@ const CreateInvoice: React.FC = () => {
     if (!formData.invoiceDate) newErrors.invoiceDate = 'Invoice date is required';
     if (!formData.dueDate) newErrors.dueDate = 'Due date is required';
     if (!formData.paymentStatus) newErrors.paymentStatus = 'Payment status is required';
+    if (!formData.invoiceAmount || isNaN(Number(formData.invoiceAmount))) {
+      newErrors.invoiceAmount = 'Valid invoice amount is required';
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -34,7 +38,6 @@ const CreateInvoice: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!validateForm()) return;
 
     const form = new FormData();
@@ -43,16 +46,17 @@ const CreateInvoice: React.FC = () => {
     form.append('invoiceDate', formData.invoiceDate);
     form.append('dueDate', formData.dueDate);
     form.append('paymentStatus', formData.paymentStatus);
+    form.append('invoiceAmount', formData.invoiceAmount); // ✅ Append amount
 
     if (attachment) form.append('attachment', attachment);
 
-   try {
-  const response = await axios.post('https://backend-billing-j81u.onrender.com/api/invoices', form, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-      'Authorization': `Bearer ${localStorage.getItem('token')}`, // Replace this with actual token variable
-    },
-  });
+    try {
+      await axios.post('https://backend-billing-j81u.onrender.com/api/invoices', form, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
       setSuccessMessage('Invoice created successfully!');
       setFormData({
         invoiceNumber: '',
@@ -60,6 +64,7 @@ const CreateInvoice: React.FC = () => {
         invoiceDate: new Date().toISOString().split('T')[0],
         dueDate: '',
         paymentStatus: 'Unpaid',
+        invoiceAmount: '', // ✅ Clear amount
       });
       setAttachment(null);
       setErrors({});
@@ -73,6 +78,7 @@ const CreateInvoice: React.FC = () => {
     <div className="max-w-2xl mx-auto bg-white p-6 rounded shadow-md">
       <h2 className="text-xl font-semibold mb-4">Create Invoice</h2>
       {successMessage && <div className="text-green-600 mb-4">{successMessage}</div>}
+
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Invoice Number */}
         <div>
@@ -136,6 +142,21 @@ const CreateInvoice: React.FC = () => {
           {errors.paymentStatus && <p className="text-red-600 text-sm mt-1">{errors.paymentStatus}</p>}
         </div>
 
+        {/* ✅ Invoice Amount */}
+        <div>
+          <label className="block font-medium text-sm">Invoice Amount (₹) *</label>
+          <input
+            type="number"
+            name="invoiceAmount"
+            value={formData.invoiceAmount}
+            onChange={(e) => setFormData({ ...formData, invoiceAmount: e.target.value })}
+            className={`w-full mt-1 p-2 border rounded ${errors.invoiceAmount ? 'border-red-500' : 'border-gray-300'}`}
+            step="0.01"
+            min="0"
+          />
+          {errors.invoiceAmount && <p className="text-red-600 text-sm mt-1">{errors.invoiceAmount}</p>}
+        </div>
+
         {/* Attachment */}
         <div>
           <label className="block font-medium text-sm">Attachment (PDF)</label>
@@ -147,7 +168,7 @@ const CreateInvoice: React.FC = () => {
           />
         </div>
 
-        {/* Submit Button */}
+        {/* Submit */}
         <div>
           <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
             Create Invoice
