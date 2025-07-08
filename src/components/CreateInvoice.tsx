@@ -182,6 +182,7 @@ const CreateInvoice: React.FC = () => {
         </div>
       </form>
     </div>
+    </div>
   );
 };
 
