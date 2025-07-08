@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'https://backend-billing-j81u.onrender.com/api';
+const API_BASE_URL = 'https://7a4dfd49-1068-49c4-8595-9766ad4ba406-00-15iczbx9nres8.riker.replit.dev/api';
 
 // Create axios instance
 const api = axios.create({
