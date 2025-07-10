@@ -52,7 +52,7 @@ const CreateInvoice: React.FC = () => {
     if (attachment) form.append('attachment', attachment);
 
     try {
-      await axios.post('https://backend-billing-emqn.onrender.com/api/invoices', form, {
+      await axios.post('https://backend-billing-production.up.railway.app/api/invoices', form, {
         headers: {
           'Content-Type': 'multipart/form-data',
           'Authorization': `Bearer ${localStorage.getItem('token')}`,

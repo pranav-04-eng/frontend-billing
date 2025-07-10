@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'https://backend-billing-emqn.onrender.com/api';
+const API_BASE_URL = 'https://backend-billing-production.up.railway.app/api';
 
 // Create axios instance
 const api = axios.create({

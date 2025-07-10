@@ -28,7 +28,7 @@ export default function CustomerDashboard() {
     const fetchInvoices = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`https://backend-billing-emqn.onrender.com/api/invoices/customer`, {
+        const response = await axios.get(`https://backend-billing-production.up.railway.app/api/invoices/customer`, {
           params: { email: user.email },
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -54,7 +54,7 @@ export default function CustomerDashboard() {
         const downloadUrl = invoice.pdfUrl || invoice.attachmentPath;
         const fullUrl = downloadUrl.startsWith('http') 
           ? downloadUrl 
-          : `https://backend-billing-emqn.onrender.com${downloadUrl}`;
+          : `https://backend-billing-production.up.railway.app${downloadUrl}`;
 
         const link = document.createElement('a');
         link.href = fullUrl;
@@ -67,7 +67,7 @@ export default function CustomerDashboard() {
       }
 
       // If no direct URL, try to fetch the PDF from the backend
-      const response = await fetch(`https://backend-billing-emqn.onrender.com/api/invoices/${invoice.id}/pdf`, {
+      const response = await fetch(`https://backend-billing-production.up.railway.app/api/invoices/${invoice.id}/pdf`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
@@ -182,7 +182,7 @@ export default function CustomerDashboard() {
                       </button>
                       {invoice.pdfUrl && (
                         <a
-                          href={invoice.pdfUrl.startsWith('http') ? invoice.pdfUrl : `https://backend-billing-emqn.onrender.com${invoice.pdfUrl}`}
+                          href={invoice.pdfUrl.startsWith('http') ? invoice.pdfUrl : `https://backend-billing-production.up.railway.app${invoice.pdfUrl}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-green-600 bg-green-50 border border-green-200 rounded-md hover:bg-green-100 hover:border-green-300 transition-colors"
