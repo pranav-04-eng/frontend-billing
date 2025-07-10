@@ -49,27 +49,43 @@ export default function CustomerDashboard() {
 
   const handleDownloadPDF = async (invoice: Invoice) => {
     try {
-      // Try to download using the pdfUrl first, then fallback to attachmentPath
-      const downloadUrl = invoice.pdfUrl || invoice.attachmentPath;
-      
-      if (!downloadUrl) {
-        alert('No PDF available for this invoice');
+      // Check if we have a pdfUrl or attachmentPath for direct download
+      if (invoice.pdfUrl || invoice.attachmentPath) {
+        const downloadUrl = invoice.pdfUrl || invoice.attachmentPath;
+        const fullUrl = downloadUrl.startsWith('http') 
+          ? downloadUrl 
+          : `https://backend-billing-emqn.onrender.com${downloadUrl}`;
+
+        const link = document.createElement('a');
+        link.href = fullUrl;
+        link.download = `Invoice_${invoice.invoiceNumber || invoice.id}.pdf`;
+        link.target = '_blank';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
         return;
       }
 
-      // If it's a relative path, prepend the backend URL
-      const fullUrl = downloadUrl.startsWith('http') 
-        ? downloadUrl 
-        : `https://backend-billing-emqn.onrender.com${downloadUrl}`;
+      // If no direct URL, try to fetch the PDF from the backend
+      const response = await fetch(`https://backend-billing-emqn.onrender.com/api/invoices/${invoice.id}/pdf`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
 
-      // Create a temporary link and trigger download
-      const link = document.createElement('a');
-      link.href = fullUrl;
-      link.download = `Invoice_${invoice.invoiceNumber || invoice.id}.pdf`;
-      link.target = '_blank';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `Invoice_${invoice.invoiceNumber || invoice.id}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      } else {
+        alert('No PDF available for this invoice');
+      }
     } catch (error) {
       console.error('Error downloading PDF:', error);
       alert('Error downloading PDF. Please try again.');
@@ -155,35 +171,28 @@ export default function CustomerDashboard() {
 {invoice.invoiceAmount ? `₹${parseFloat(invoice.invoiceAmount).toFixed(2)}` : 'N/A'}
 </td>
                   <td className="px-6 py-4 text-sm">
-                    {(invoice.pdfUrl || invoice.attachmentPath) ? (
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => handleDownloadPDF(invoice)}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 hover:border-blue-300 transition-colors"
-                          title="Download PDF"
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleDownloadPDF(invoice)}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 hover:border-blue-300 transition-colors"
+                        title="Download PDF"
+                      >
+                        <Download className="h-3 w-3" />
+                        Download
+                      </button>
+                      {invoice.pdfUrl && (
+                        <a
+                          href={invoice.pdfUrl.startsWith('http') ? invoice.pdfUrl : `https://backend-billing-emqn.onrender.com${invoice.pdfUrl}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-green-600 bg-green-50 border border-green-200 rounded-md hover:bg-green-100 hover:border-green-300 transition-colors"
+                          title="View PDF"
                         >
-                          <Download className="h-3 w-3" />
-                          Download
-                        </button>
-                        {invoice.pdfUrl && (
-                          <a
-                            href={invoice.pdfUrl.startsWith('http') ? invoice.pdfUrl : `https://backend-billing-emqn.onrender.com${invoice.pdfUrl}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-green-600 bg-green-50 border border-green-200 rounded-md hover:bg-green-100 hover:border-green-300 transition-colors"
-                            title="View PDF"
-                          >
-                            <ExternalLink className="h-3 w-3" />
-                            View
-                          </a>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-1 text-gray-400">
-                        <FileText className="h-3 w-3" />
-                        <span className="text-xs">No PDF</span>
-                      </div>
-                    )}
+                          <ExternalLink className="h-3 w-3" />
+                          View
+                        </a>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}
