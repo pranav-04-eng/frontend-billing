@@ -28,7 +28,7 @@ export default function CustomerDashboard() {
     const fetchInvoices = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`https://7a4dfd49-1068-49c4-8595-9766ad4ba406-00-15iczbx9nres8.riker.replit.dev/api/invoices/customer`, {
+        const response = await axios.get(`https://backend-billing-emqn.onrender.com/api/invoices/customer`, {
           params: { email: user.email },
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -60,7 +60,7 @@ export default function CustomerDashboard() {
       // If it's a relative path, prepend the backend URL
       const fullUrl = downloadUrl.startsWith('http') 
         ? downloadUrl 
-        : `https://7a4dfd49-1068-49c4-8595-9766ad4ba406-00-15iczbx9nres8.riker.replit.dev${downloadUrl}`;
+        : `https://backend-billing-emqn.onrender.com${downloadUrl}`;
 
       // Create a temporary link and trigger download
       const link = document.createElement('a');
@@ -167,7 +167,7 @@ export default function CustomerDashboard() {
                         </button>
                         {invoice.pdfUrl && (
                           <a
-                            href={invoice.pdfUrl.startsWith('http') ? invoice.pdfUrl : `https://7a4dfd49-1068-49c4-8595-9766ad4ba406-00-15iczbx9nres8.riker.replit.dev${invoice.pdfUrl}`}
+                            href={invoice.pdfUrl.startsWith('http') ? invoice.pdfUrl : `https://backend-billing-emqn.onrender.com${invoice.pdfUrl}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-green-600 bg-green-50 border border-green-200 rounded-md hover:bg-green-100 hover:border-green-300 transition-colors"
